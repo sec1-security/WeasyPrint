@@ -1090,6 +1090,76 @@ def test_flex_flow_invalid(rule):
 
 
 @assert_no_logs
+@pytest.mark.parametrize('rule, result', (
+    ('grid-auto-columns: 40px', {'grid_auto_columns': ((40, 'px'),)}),
+    ('grid-auto-columns: 2fr', {'grid_auto_columns': ((2, 'fr'),)}),
+    ('grid-auto-columns: 18%', {'grid_auto_columns': ((18, '%'),)}),
+    ('grid-auto-columns: auto', {'grid_auto_columns': ('auto',)}),
+    ('grid-auto-columns: min-content',
+     {'grid_auto_columns': ('min-content',)}),
+    ('grid-auto-columns: max-content',
+     {'grid_auto_columns': ('max-content',)}),
+    ('grid-auto-rows: fit-content(20%)',
+     {'grid_auto_rows': (('fit-content()', (20, '%')),)}),
+    ('grid-auto-rows: minmax(20px, 25px)',
+     {'grid_auto_rows': (('minmax()', (20, 'px'), (25, 'px')),)}),
+    ('grid-auto-rows: minmax(min-content, max-content)',
+     {'grid_auto_rows': (('minmax()', 'min-content', 'max-content'),)}),
+    ('grid-auto-columns: min-content max-content',
+     {'grid_auto_columns': ('min-content', 'max-content')}),
+))
+def test_grid_auto_columns_rows(rule, result):
+    assert expand_to_dict(rule) == result
+
+
+@assert_no_logs
+@pytest.mark.parametrize('rule', (
+    'grid-auto-columns: 40',
+    'grid-auto-rows: coucou',
+    'grid-auto-columns: fit-content',
+    'grid-auto-rows: fit-content(min-content)',
+    'grid-auto-columns: minmax(40px)',
+    'grid-auto-rows: minmax(2fr, 1fr)',
+    'grid-auto-columns: 1fr 1fr coucou',
+    'grid-auto-rows: fit-content()',
+    'grid-auto-columns: fit-content(2%, 18%)',
+))
+def test_grid_auto_columns_rows_invalid(rule):
+    assert_invalid(rule)
+
+@assert_no_logs
+@pytest.mark.parametrize('rule, result', (
+    ('grid-auto-flow: row', {'grid_auto_flow': ('row',)}),
+    ('grid-auto-flow: column', {'grid_auto_flow': ('column',)}),
+    ('grid-auto-flow: row dense', {'grid_auto_flow': ('row', 'dense')}),
+    ('grid-auto-flow: column dense', {'grid_auto_flow': ('column', 'dense')}),
+    ('grid-auto-flow: dense row', {'grid_auto_flow': ('dense', 'row')}),
+    ('grid-auto-flow: dense column', {'grid_auto_flow': ('dense', 'column')}),
+))
+def test_grid_auto_flow(rule, result):
+    assert expand_to_dict(rule) == result
+
+
+@assert_no_logs
+@pytest.mark.parametrize('rule', (
+    'grid-auto-flow: row row',
+    'grid-auto-flow: column column',
+    'grid-auto-flow: dense dense',
+    'grid-auto-flow: dense',
+    'grid-auto-flow: coucou',
+    'grid-auto-flow: row column',
+    'grid-auto-flow: column row',
+    'grid-auto-flow: row coucou',
+    'grid-auto-flow: column coucou',
+    'grid-auto-flow: coucou row',
+    'grid-auto-flow: coucou column',
+    'grid-auto-flow: row column dense',
+))
+def test_grid_auto_flow_invalid(rule):
+    assert_invalid(rule)
+
+
+@assert_no_logs
 @pytest.mark.parametrize('rule', (
     'list-style-type: symbols()',
     'list-style-type: symbols(cyclic)',
